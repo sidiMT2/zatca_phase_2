@@ -1204,7 +1204,6 @@ def compliance_api_call(
             timeout=300,
         )
         # frappe.throw(response.status_code)
-        print(response.status_code)
         frappe.msgprint(_(response.text))
         if response.status_code == 200:
             return response.text

@@ -173,8 +173,8 @@ def attach_qr_image(qrcodeb64, sales_invoice_doc):
             )
             # frappe.log("Custom field 'ksa_einv_qr' created.")
         qr_code = sales_invoice_doc.get("ksa_einv_qr")
-        if qr_code and frappe.db.exists({"doctype": "File", "file_url": qr_code}):
-            return
+        # if qr_code and frappe.db.exists({"doctype": "File", "file_url": qr_code}):
+        #     return
         qr_image = io.BytesIO()
         qr = qr_create(qrcodeb64, error="L")
         qr.png(qr_image, scale=8, quiet_zone=1)
