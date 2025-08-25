@@ -1,6 +1,7 @@
 from erpnext import get_default_company
 import frappe
 from frappe.utils.data import get_datetime
+from zatca_erpgulf.zatca_erpgulf.sign_invoice import resubmit_invoices, zatca_call
 
 
 @frappe.whitelist()
@@ -44,3 +45,20 @@ def invoices_reports(from_date, to_date):
         "reported_invoices": reported_invoices,
         "cleared_invoices": cleared_invoices,
     }
+
+
+@frappe.whitelist()
+def resubmit_zatca_invoices():
+    failed_invoices = frappe.get_all(
+        "Sales Invoice",
+        filters=[
+            ["custom_zatca_full_response", "like", "%ERROR%"],
+            [
+                "custom_zatca_status",
+                "in",
+                ["Not Submitted", "503 Service Unavailable"],
+            ],
+        ],
+        pluck="name",
+    )
+    resubmit_invoices(failed_invoices)

@@ -633,6 +633,8 @@ def customer_data(invoice, sales_invoice_doc):
         cac_accountingcustomerparty = ET.SubElement(
             invoice, "cac:AccountingCustomerParty"
         )
+        if customer_doc.custom_b2c == 1:
+            return invoice
         cac_party_2 = ET.SubElement(cac_accountingcustomerparty, "cac:Party")
         cac_partyidentification_1 = ET.SubElement(
             cac_party_2, "cac:PartyIdentification"
