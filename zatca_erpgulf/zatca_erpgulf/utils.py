@@ -49,10 +49,15 @@ def invoices_reports(from_date, to_date):
 
 @frappe.whitelist()
 def resubmit_zatca_invoices():
+    company_doc = frappe.get_doc("Company", get_default_company())
+    if not company_doc.custom_zatca_invoice_enabled:
+        return
+
     failed_invoices = frappe.get_all(
         "Sales Invoice",
         filters=[
             ["custom_zatca_full_response", "like", "%ERROR%"],
+            ["docstatus", "=", 1],
             [
                 "custom_zatca_status",
                 "in",
