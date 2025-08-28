@@ -225,8 +225,9 @@ from . import __version__ as app_version
 scheduler_events = {
     "cron": {
         "*/30 * * * *": [
-            "zatca_erpgulf.zatca_erpgulf.scheduler_event.submit_invoices_to_zatca_background_process"
-        ]
+            "zatca_erpgulf.zatca_erpgulf.scheduler_event.submit_invoices_to_zatca_background_process",
+            "zatca_erpgulf.zatca_erpgulf.utils.resubmit_zatca_invoices",
+        ],
     }
 }
 
