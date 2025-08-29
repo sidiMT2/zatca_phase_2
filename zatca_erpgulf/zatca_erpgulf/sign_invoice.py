@@ -980,12 +980,14 @@ def zatca_call_compliance(
 
 
 @frappe.whitelist(allow_guest=False)
-def zatca_background(invoice_number, source_doc, bypass_background_check=False):
+def zatca_background(invoice_number, source_doc=None, bypass_background_check=False):
     """defines the zatca bacground"""
     try:
         # frappe.throw("DEBUG: Country found in address: ")
         if source_doc:
             source_doc = frappe.get_doc(json.loads(source_doc))
+        else:
+            source_doc = frappe.get_doc("Sales Invoice", invoice_number)
         sales_invoice_doc = frappe.get_doc("Sales Invoice", invoice_number)
         company_name = sales_invoice_doc.company
         settings = frappe.get_doc("Company", company_name)
