@@ -1395,15 +1395,14 @@ def zatca_background_on_submit(doc, _method=None, bypass_background_check=False)
         if company_doc.custom_zatca_invoice_enabled != 1:
             # frappe.msgprint("Zatca Invoice is not enabled. Submitting the document.")
             return  # Exit the function without further checks
-        
-        
+
         is_gpos_installed = "gpos" in frappe.get_installed_apps()
         field_exists = frappe.get_meta("Sales Invoice").has_field("custom_offline_invoice_number")
 
         # If GPOS is installed and field exists, check its value
         if is_gpos_installed and field_exists:
             offline_invoice_number = sales_invoice_doc.get("custom_offline_invoice_number")
-            
+
             # If the field has data and Phase-1 is enabled, skip QR creation
             if (
                 offline_invoice_number
@@ -1411,15 +1410,14 @@ def zatca_background_on_submit(doc, _method=None, bypass_background_check=False)
                 and company_doc.custom_phase_1_or_2 == "Phase-1"
             ):
                 return
-            
-    # If offline invoice number is blank → only create QR when Phase-1
+
+            # If offline invoice number is blank → only create QR when Phase-1
             if company_doc.custom_phase_1_or_2 == "Phase-1":
                 create_qr_code(sales_invoice_doc, method=_method)
                 return
             if company_doc.custom_phase_1_or_2 == "Phase-2":
-        
+
                 pass 
-            
 
         # Separate check for ZATCA Phase-1 condition (when GPOS is not applicable)
         if (
@@ -1722,6 +1720,7 @@ def zatca_background_on_submit(doc, _method=None, bypass_background_check=False)
             frappe.throw(
                 _("This invoice has already been submitted to Zakat and Tax Authority.")
             )
+
         company_name = sales_invoice_doc.company
         settings = frappe.get_doc("Company", company_name)
         # if settings.custom_phase_1_or_2 == "Phase-2":
@@ -1735,6 +1734,20 @@ def zatca_background_on_submit(doc, _method=None, bypass_background_check=False)
                         + str(invoice_number)
                     )
                 )
+        if len(sales_invoice_doc.get("items", [])) and sales_invoice_doc.items[0].get(
+            "item_tax_template"
+        ):
+            tax_template_doc = frappe.get_doc(
+                "Item Tax Template", sales_invoice_doc.items[0].get("item_tax_template")
+            )
+            sales_invoice_doc.db_set(
+                "custom_zatca_tax_category", tax_template_doc.custom_zatca_tax_category
+            )
+            sales_invoice_doc.db_set(
+                "custom_exemption_reason_code",
+                tax_template_doc.custom_exemption_reason_code,
+            )
+
         if settings.custom_phase_1_or_2 == "Phase-2":
 
             if field_exists and sales_invoice_doc.custom_unique_id:
