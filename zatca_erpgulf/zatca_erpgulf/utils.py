@@ -1,5 +1,6 @@
 from erpnext import get_default_company
 import frappe
+from frappe.utils import add_to_date, now_datetime
 from frappe.utils.data import get_datetime
 from zatca_erpgulf.zatca_erpgulf.sign_invoice import resubmit_invoices, zatca_call
 
@@ -53,10 +54,13 @@ def resubmit_zatca_invoices():
     if not company_doc.custom_zatca_invoice_enabled:
         return
 
+    past_24_hours_time = add_to_date(now_datetime(), hours=-24)
+
     failed_invoices = frappe.get_all(
         "Sales Invoice",
         filters=[
-            ["custom_zatca_full_response", "like", "%ERROR%"],
+            # ["custom_zatca_full_response", "like", "%ERROR%"],
+            ["modified", ">=", past_24_hours_time],
             ["docstatus", "=", 1],
             [
                 "custom_zatca_status",
