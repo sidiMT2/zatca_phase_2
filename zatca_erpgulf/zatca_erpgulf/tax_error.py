@@ -1,6 +1,7 @@
 """this module contains functions that are used to validate tax information
 in sales invoices."""
 
+from erpnext import get_default_company
 from frappe import _
 import frappe
 
@@ -13,6 +14,9 @@ def validate_sales_invoice_taxes(doc, event=None):
     :param sales_invoice_doc: The sales invoice document object
     :return: None
     """
+    company_doc = frappe.get_doc("Company",get_default_company())
+    if not company_doc.custom_zatca_invoice_enabled:
+        return
     is_gpos_installed = "gpos" in frappe.get_installed_apps()
     field_exists = frappe.get_meta(doc.doctype).has_field("custom_unique_id")
 
